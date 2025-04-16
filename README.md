@@ -2,6 +2,8 @@
 
 A modern link shortener web application with separate admin and user interfaces. Built with **HTML, CSS, JavaScript, and Bootstrap**.
 
+[![Live Site 🚀](https://img.shields.io/badge/Live-Demo-green?style=flat-square)](https://patu2510.github.io/link-shortener/)
+
 ## 🚀 Features
 
 ### 🧑‍💻 User Page
