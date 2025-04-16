@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Link | URL Shortener</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 5rem 0;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .url-shortener-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .url-shortener-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .short-link {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .copy-btn {
+            cursor: pointer;
+        }
+        
+        .ad-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .login-card {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-section {
+            display: none;
+        }
+        
+        .stats-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Quick<span class="text-primary">Link</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="admin-login-link">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content - User Page -->
+    <div id="user-page">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-3">Shorten Your Links</h1>
+                        <p class="lead mb-4">Make your URLs easier to share with our simple and fast link shortener service.</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="/hs.jpg" alt="Link shortening illustration" class="img-fluid rounded-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- URL Shortener Section -->
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card url-shortener-card p-4">
+                        <div class="card-body">
+                            <h3 class="mb-4">Create Short Link</h3>
+                            <form id="url-form">
+                                <div class="mb-3">
+                                    <label for="long-url" class="form-label">Enter your long URL</label>
+                                    <input type="url" class="form-control form-control-lg" id="long-url" placeholder="https://example.com/very/long/url/that/needs/shortening" required>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">Shorten URL</button>
+                                </div>
+                            </form>
+                            <div class="short-link mt-4" id="result-container">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span id="short-url" class="me-2 text-break"></span>
+                                    <span class="copy-btn" title="Copy to clipboard">
+                                        <i class="fas fa-copy"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section -->
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-8">
+                    <div class="ad-container" id="ad-display">
+                        <p class="text-center text-muted mb-0">Advertisement Space</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="row mt-5 g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-bolt text-primary mb-3" style="font-size: 2.5rem;"></i>
+                            <h4>Fast & Reliable</h4>
+                            <p class="text-muted">Create shortened URLs in seconds with our high-performance service.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-shield-alt text-primary mb-3" style="font-size: 2.5rem;"></i>
+                            <h4>Secure Links</h4>
+                            <p class="text-muted">All shortened links are secure and protected from misuse.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chart-line text-primary mb-3" style="font-size: 2.5rem;"></i>
+                            <h4>Easy Sharing</h4>
+                            <p class="text-muted">Simplified links are easier to share on social media and messaging apps.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Page -->
+    <div id="admin-login-page" style="display: none;">
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card login-card">
+                        <div class="card-body">
+                            <h3 class="card-title text-center mb-4">Admin Login</h3>
+                            <form id="admin-login-form">
+                                <div class="mb-3">
+                                    <label for="admin-email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="admin-email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="admin-password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="admin-password" required>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Login</button>
+                                </div>
+                                <p class="text-danger mt-3" id="login-error" style="display: none;"></p>
+                            </form>
+                            <div class="mt-3 text-center">
+                                <a href="#" id="back-to-user">← Back to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Page -->
+    <div id="admin-dashboard" class="admin-section">
+        <div class="container my-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Admin Dashboard</h2>
+                <button id="admin-logout" class="btn btn-outline-danger">Logout</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stats-icon me-3">
+                                <i class="fas fa-link"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Total Links</h6>
+                                <h3 id="total-links-count">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card stats-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stats-icon me-3">
+                                <i class="fas fa-ad"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-1">Active Ads</h6>
+                                <h3 id="active-ads-count">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="links-tab" data-bs-toggle="tab" data-bs-target="#links-panel" type="button" role="tab">Link Management</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="ads-tab" data-bs-toggle="tab" data-bs-target="#ads-panel" type="button" role="tab">Ad Management</button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="adminTabsContent">
+                <!-- Links Management Tab -->
+                <div class="tab-pane fade show active" id="links-panel" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">All Shortened Links</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Original URL</th>
+                                            <th>Short URL</th>
+                                            <th>Created Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="links-table-body">
+                                        <!-- Links will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p id="no-links-message" class="text-center text-muted my-4">No links have been created yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ads Management Tab -->
+                <div class="tab-pane fade" id="ads-panel" role="tabpanel">
+                    <div class="card mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Ad Management</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAdModal">
+                                <i class="fas fa-plus me-1"></i> Add New Ad
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ad Title</th>
+                                            <th>Content</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ads-table-body">
+                                        <!-- Ads will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p id="no-ads-message" class="text-center text-muted my-4">No ads have been created yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ad Modal -->
+    <div class="modal fade" id="addAdModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Advertisement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-ad-form">
+                        <div class="mb-3">
+                            <label for="ad-title" class="form-label">Ad Title</label>
+                            <input type="text" class="form-control" id="ad-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ad-content" class="form-label">Ad Content/HTML</label>
+                            <textarea class="form-control" id="ad-content" rows="4" required></textarea>
+                            <small class="text-muted">You can include HTML for formatting or images.</small>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="ad-active" checked>
+                            <label class="form-check-label" for="ad-active">
+                                Active
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-ad-btn">Save Ad</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Ad Modal -->
+    <div class="modal fade" id="editAdModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Advertisement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-ad-form">
+                        <input type="hidden" id="edit-ad-id">
+                        <div class="mb-3">
+                            <label for="edit-ad-title" class="form-label">Ad Title</label>
+                            <input type="text" class="form-control" id="edit-ad-title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-ad-content" class="form-label">Ad Content/HTML</label>
+                            <textarea class="form-control" id="edit-ad-content" rows="4" required></textarea>
+                            <small class="text-muted">You can include HTML for formatting or images.</small>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="edit-ad-active">
+                            <label class="form-check-label" for="edit-ad-active">
+                                Active
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="update-ad-btn">Update Ad</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Quick<span class="text-primary">Link</span></h4>
+                    <p>A simple and efficient URL shortener service.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 QuickLink. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize local storage for links and ads if not exists
+        if (!localStorage.getItem('shortLinks')) {
+            localStorage.setItem('shortLinks', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('ads')) {
+            localStorage.setItem('ads', JSON.stringify([
+                {
+                    id: 1,
+                    title: 'Default Advertisement',
+                    content: '<div class="text-center"><img src="/ad.jpg" alt="Advertisement Banner" class="img-fluid"><p class="mt-2 mb-0 text-muted">Your ad could be here!</p></div>',
+                    active: true,
+                    createdAt: new Date().toISOString()
+                }
+            ]));
+        }
+
+        // DOM Elements
+        const userPage = document.getElementById('user-page');
+        const adminLoginPage = document.getElementById('admin-login-page');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const adminLoginLink = document.getElementById('admin-login-link');
+        const backToUserLink = document.getElementById('back-to-user');
+        const urlForm = document.getElementById('url-form');
+        const longUrlInput = document.getElementById('long-url');
+        const resultContainer = document.getElementById('result-container');
+        const shortUrlDisplay = document.getElementById('short-url');
+        const copyBtn = document.querySelector('.copy-btn');
+        const adminLoginForm = document.getElementById('admin-login-form');
+        const adminEmail = document.getElementById('admin-email');
+        const adminPassword = document.getElementById('admin-password');
+        const loginError = document.getElementById('login-error');
+        const adminLogout = document.getElementById('admin-logout');
+        const totalLinksCount = document.getElementById('total-links-count');
+        const activeAdsCount = document.getElementById('active-ads-count');
+        const linksTableBody = document.getElementById('links-table-body');
+        const noLinksMessage = document.getElementById('no-links-message');
+        const adsTableBody = document.getElementById('ads-table-body');
+        const noAdsMessage = document.getElementById('no-ads-message');
+        const addAdForm = document.getElementById('add-ad-form');
+        const saveAdBtn = document.getElementById('save-ad-btn');
+        const updateAdBtn = document.getElementById('update-ad-btn');
+        const adDisplay = document.getElementById('ad-display');
+
+        // Navigation Functions
+        adminLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            userPage.style.display = 'none';
+            adminLoginPage.style.display = 'block';
+            adminDashboard.style.display = 'none';
+        });
+
+        backToUserLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            userPage.style.display = 'block';
+            adminLoginPage.style.display = 'none';
+            adminDashboard.style.display = 'none';
+        });
+
+        adminLogout.addEventListener('click', function() {
+            userPage.style.display = 'block';
+            adminLoginPage.style.display = 'none';
+            adminDashboard.style.display = 'none';
+            sessionStorage.removeItem('adminAuthenticated');
+        });
+
+        // URL Shortening Function
+        urlForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const longUrl = longUrlInput.value.trim();
+            
+            if (longUrl) {
+                // Generate a short code
+                const shortCode = generateShortCode();
+                const shortUrl = `${window.location.origin}/s/${shortCode}`;
+                
+                // Save the link
+                saveLink(longUrl, shortCode);
+                
+                // Display the result
+                shortUrlDisplay.textContent = shortUrl;
+                resultContainer.style.display = 'block';
+                
+                // Clear input
+                longUrlInput.value = '';
+            }
+        });
+
+        // Copy to clipboard functionality
+        copyBtn.addEventListener('click', function() {
+            const textToCopy = shortUrlDisplay.textContent;
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                // Show feedback (could be improved with a toast or alert)
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                }, 2000);
+            });
+        });
+
+        // Admin Login
+        adminLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = adminEmail.value;
+            const password = adminPassword.value;
+            
+            // Simple authentication (in a real app, this would be server-side)
+            if (email === 'jprathmesh581@gmail.com' && password === 'admin123') { // Using a simple password for demo
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                userPage.style.display = 'none';
+                adminLoginPage.style.display = 'none';
+                adminDashboard.style.display = 'block';
+                loadAdminDashboard();
+                adminLoginForm.reset();
+                loginError.style.display = 'none';
+            } else {
+                loginError.textContent = 'Invalid email or password';
+                loginError.style.display = 'block';
+            }
+        });
+
+        // Check if admin is authenticated on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                userPage.style.display = 'none';
+                adminLoginPage.style.display = 'none';
+                adminDashboard.style.display = 'block';
+                loadAdminDashboard();
+            }
+            
+            // Display random ad on the user page
+            displayRandomAd();
+        });
+
+        // Generate a random short code
+        function generateShortCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Save link to localStorage
+        function saveLink(originalUrl, shortCode) {
+            const links = JSON.parse(localStorage.getItem('shortLinks'));
+            links.push({
+                originalUrl,
+                shortCode,
+                shortUrl: `${window.location.origin}/s/${shortCode}`,
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('shortLinks', JSON.stringify(links));
+        }
+
+        // Load admin dashboard data
+        function loadAdminDashboard() {
+            // Load stats
+            const links = JSON.parse(localStorage.getItem('shortLinks'));
+            const ads = JSON.parse(localStorage.getItem('ads'));
+            const activeAds = ads.filter(ad => ad.active);
+            
+            totalLinksCount.textContent = links.length;
+            activeAdsCount.textContent = activeAds.length;
+            
+            // Load links table
+            loadLinksTable();
+            
+            // Load ads table
+            loadAdsTable();
+        }
+
+        // Load links table
+        function loadLinksTable() {
+            const links = JSON.parse(localStorage.getItem('shortLinks'));
+            linksTableBody.innerHTML = '';
+            
+            if (links.length === 0) {
+                noLinksMessage.style.display = 'block';
+                return;
+            }
+            
+            noLinksMessage.style.display = 'none';
+            
+            links.forEach((link, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td title="${link.originalUrl}">${truncateText(link.originalUrl, 50)}</td>
+                    <td>${link.shortUrl}</td>
+                    <td>${new Date(link.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger delete-link" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                linksTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-link').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    deleteLink(index);
+                });
+            });
+        }
+
+        // Delete link
+        function deleteLink(index) {
+            if (confirm('Are you sure you want to delete this link?')) {
+                const links = JSON.parse(localStorage.getItem('shortLinks'));
+                links.splice(index, 1);
+                localStorage.setItem('shortLinks', JSON.stringify(links));
+                loadLinksTable();
+                totalLinksCount.textContent = links.length;
+            }
+        }
+
+        // Load ads table
+        function loadAdsTable() {
+            const ads = JSON.parse(localStorage.getItem('ads'));
+            adsTableBody.innerHTML = '';
+            
+            if (ads.length === 0) {
+                noAdsMessage.style.display = 'block';
+                return;
+            }
+            
+            noAdsMessage.style.display = 'none';
+            
+            ads.forEach((ad, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ad.title}</td>
+                    <td title="${ad.content}">${truncateText(ad.content, 50)}</td>
+                    <td>${ad.active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary edit-ad me-1" data-index="${index}" data-bs-toggle="modal" data-bs-target="#editAdModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-ad" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                adsTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-ad').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    loadAdForEditing(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-ad').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    deleteAd(index);
+                });
+            });
+        }
+
+        //// Function to load ad for editing
+        function loadAdForEditing(index) {
+            const ads = JSON.parse(localStorage.getItem('ads'));
+            const ad = ads[index];
+            
+            document.getElementById('edit-ad-id').value = index;
+            document.getElementById('edit-ad-title').value = ad.title;
+            document.getElementById('edit-ad-content').value = ad.content;
+            document.getElementById('edit-ad-active').checked = ad.active;
+        }
+
+        // Delete ad
+        function deleteAd(index) {
+            if (confirm('Are you sure you want to delete this ad?')) {
+                const ads = JSON.parse(localStorage.getItem('ads'));
+                ads.splice(index, 1);
+                localStorage.setItem('ads', JSON.stringify(ads));
+                loadAdsTable();
+                const activeAds = ads.filter(ad => ad.active);
+                activeAdsCount.textContent = activeAds.length;
+                
+                // Update ad display on user page
+                displayRandomAd();
+            }
+        }
+
+        // Save new ad
+        saveAdBtn.addEventListener('click', function() {
+            const title = document.getElementById('ad-title').value.trim();
+            const content = document.getElementById('ad-content').value.trim();
+            const active = document.getElementById('ad-active').checked;
+            
+            if (title && content) {
+                const ads = JSON.parse(localStorage.getItem('ads'));
+                ads.push({
+                    id: Date.now(), // Use timestamp as ID
+                    title,
+                    content,
+                    active,
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('ads', JSON.stringify(ads));
+                
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addAdModal'));
+                modal.hide();
+                document.getElementById('add-ad-form').reset();
+                
+                // Reload ads table
+                loadAdsTable();
+                const activeAds = ads.filter(ad => ad.active);
+                activeAdsCount.textContent = activeAds.length;
+                
+                // Update ad display on user page
+                displayRandomAd();
+            }
+        });
+
+        // Update existing ad
+        updateAdBtn.addEventListener('click', function() {
+            const index = document.getElementById('edit-ad-id').value;
+            const title = document.getElementById('edit-ad-title').value.trim();
+            const content = document.getElementById('edit-ad-content').value.trim();
+            const active = document.getElementById('edit-ad-active').checked;
+            
+            if (title && content) {
+                const ads = JSON.parse(localStorage.getItem('ads'));
+                ads[index].title = title;
+                ads[index].content = content;
+                ads[index].active = active;
+                localStorage.setItem('ads', JSON.stringify(ads));
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editAdModal'));
+                modal.hide();
+                
+                // Reload ads table
+                loadAdsTable();
+                const activeAds = ads.filter(ad => ad.active);
+                activeAdsCount.textContent = activeAds.length;
+                
+                // Update ad display on user page
+                displayRandomAd();
+            }
+        });
+
+        // Display random ad on user page
+        function displayRandomAd() {
+            const ads = JSON.parse(localStorage.getItem('ads'));
+            const activeAds = ads.filter(ad => ad.active);
+            
+            if (activeAds.length > 0) {
+                const randomIndex = Math.floor(Math.random() * activeAds.length);
+                const ad = activeAds[randomIndex];
+                adDisplay.innerHTML = ad.content;
+            } else {
+                adDisplay.innerHTML = '<p class="text-center text-muted">No active advertisements</p>';
+            }
+        }
+
+        // Helper function to truncate text
+        function truncateText(text, maxLength) {
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+
+        // Add a link redirection handler
+        // In a real application, this would be server-side logic
+        window.addEventListener('load', function() {
+            // Check if URL contains a short code pattern
+            const path = window.location.pathname;
+            const shortCodeMatch = path.match(/\/s\/([a-zA-Z0-9]{6})$/);
+            
+            if (shortCodeMatch) {
+                const shortCode = shortCodeMatch[1];
+                const links = JSON.parse(localStorage.getItem('shortLinks'));
+                const linkMatch = links.find(link => link.shortCode === shortCode);
+                
+                if (linkMatch) {
+                    // Redirect to the original URL
+                    window.location.href = linkMatch.originalUrl;
+                } else {
+                    // Show error if link not found
+                    document.body.innerHTML = `
+                        <div class="container my-5">
+                            <div class="alert alert-danger">
+                                <h4>Link Not Found</h4>
+                                <p>The shortened link you followed does not exist or has been removed.</p>
+                                <a href="/" class="btn btn-primary mt-3">Go to Homepage</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
